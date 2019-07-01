@@ -48,6 +48,8 @@ if __name__ == "__main__":
     counter = 0;
     counter_range = 360
 
+    start_time = datetime.datetime.now()
+
     while True:
         im = Image.new("RGB",(w+12,11), "black")
         d = ImageDraw.Draw(im)
@@ -62,7 +64,11 @@ if __name__ == "__main__":
                 (r,g,b) = im.getpixel((x,y))
 
                 if r==0 and b==0 and g==0:
-                    offset = x * 2 + y * 2
+                    s = now.second + now.microsecond * 1e-6
+                    theta = s/60 * 2 * math.pi + math.pi / 2
+                    cx = math.cos(theta) * 4
+                    cy = math.sin(theta) * 4
+                    offset = 600-math.sqrt((x-5+cx)**2 + (y-5+cy)**2) * 5
                     frame[x][y].set_hsv((counter+offset)%360,255,20)
                 else:
                     frame[x][y].r = r
@@ -71,7 +77,12 @@ if __name__ == "__main__":
 
 
         strip.commit()
-        time.sleep(.01)
+        time.sleep(.003)
         counter += 1
+
+        if counter % 100 == 0:
+            delta = now - start_time
+            fps = counter / delta.total_seconds()
+            print(f"FPS: {fps:0.2f}")
 
 
