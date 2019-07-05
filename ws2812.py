@@ -20,7 +20,7 @@ SEND_HZ = 6000000
 # Precalculate all the byte values to bytestrings for
 # fast lookup to send over the SPI bus
 SEND_0 = bytes([0b1000000])
-SEND_1 = bytes([0b1111110])
+SEND_1 = bytes([0b1111100])
 
 spi_bytes = []
 for i in range(256):

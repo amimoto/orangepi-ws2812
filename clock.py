@@ -55,7 +55,7 @@ if __name__ == "__main__":
         d = ImageDraw.Draw(im)
 
         now = datetime.datetime.now()
-        r=g=b=50
+        r=g=b=255
         d.text((0,0), now.strftime("%H"), font=fnt, fill=(r,g,b))
         d.text((0,6), now.strftime("%M"), font=fnt, fill=(r,g,b))
 
@@ -77,7 +77,7 @@ if __name__ == "__main__":
 
 
         strip.commit()
-        time.sleep(.003)
+        time.sleep(.01)
         counter += 1
 
         if counter % 100 == 0:
