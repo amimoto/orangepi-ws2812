@@ -18,6 +18,8 @@ import time
 import datetime
 import socket
 import math
+import re
+import random
 
 from izaber import initialize, config
 
@@ -72,9 +74,15 @@ class Strip:
         self.leds = [ LED() for i in range(leds) ]
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((host,port))
+        self.socket.settimeout(1)
 
     def commit(self):
         data = bytes(self)
+        while True:
+            buf = self.socket.recv(1024)
+            if re.search('OK', buf.decode('utf8')):
+                break
+            print(".")
         self.socket.send(data)
 
     def set_all_rgb(self,r,g,b):
@@ -97,9 +105,9 @@ class Strip:
     def __setitem__(self,i,v):
         self.leds[i] = v
 
-if __name__ == "__main__":
+def main():
     LEDS = 121
-    strip = Strip('10.4.10.96',23,LEDS)
+    strip = Strip('10.3.224.87',23,LEDS)
 
     frame = [
                 [
@@ -139,20 +147,38 @@ if __name__ == "__main__":
                     theta = s/60 * 2 * math.pi + math.pi / 2
                     cx = math.cos(theta) * 4
                     cy = math.sin(theta) * 4
-                    offset = 600-math.sqrt((x-5+cx)**2 + (y-5+cy)**2) * 5
-                    frame[x][y].set_hsv((counter+offset)%360,255,10)
+                    offset = 600-math.sqrt((x-5+cx)**2 + (y-5+cy)**2) * 20
+
+                    intensity = ( math.cos(counter/100) + 1 ) / 2
+                    intensity = 20*intensity + 30
+
+                    frame[x][y].set_hsv((counter+offset)%360,255,intensity)
                 else:
-                    frame[x][y].r = r
-                    frame[x][y].g = g
-                    frame[x][y].b = b
+                    offset = - x/20 + y/10 + counter / 100
+                    intensity = ( math.cos(offset*10) + 1 ) / 2
+                    #intensity = .2*intensity + .8
+                    intensity = .3*intensity + .7
+                    #intensity = .5*intensity + .5
+
+                    frame[x][y].r = int(r*intensity)
+                    frame[x][y].g = int(g*intensity)
+                    frame[x][y].b = int(b*intensity)
 
         strip.commit()
         counter += 1
-        time.sleep(0.02)
+        time.sleep(0.01)
 
         if counter % 100 == 0:
             delta = now - start_time
             fps = counter / delta.total_seconds()
             print(f"FPS: {fps:0.2f}")
 
+
+while True:
+  try:
+    main()
+  except Exception as ex:
+    now = datetime.datetime.now()
+    print(f"Error at {now}! {ex}")
+    time.sleep(1)
 
