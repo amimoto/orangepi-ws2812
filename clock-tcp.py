@@ -107,7 +107,7 @@ class Strip:
 
 def main():
     LEDS = 121
-    strip = Strip('10.3.224.87',23,LEDS)
+    strip = Strip('10.6.6.2',23,LEDS)
 
     frame = [
                 [
@@ -154,11 +154,12 @@ def main():
 
                     frame[x][y].set_hsv((counter+offset)%360,255,intensity)
                 else:
-                    offset = - x/20 + y/10 + counter / 100
-                    intensity = ( math.cos(offset*10) + 1 ) / 2
+                    #offset = - x/20 + y/10 + counter / 100
+                    #intensity = ( math.cos(offset*10) + 1 ) / 2
                     #intensity = .2*intensity + .8
-                    intensity = .3*intensity + .7
+                    #intensity = .3*intensity + .7
                     #intensity = .5*intensity + .5
+                    intensity = 1
 
                     frame[x][y].r = int(r*intensity)
                     frame[x][y].g = int(g*intensity)
@@ -166,12 +167,12 @@ def main():
 
         strip.commit()
         counter += 1
-        time.sleep(0.01)
+        time.sleep(0.02)
 
-        if counter % 100 == 0:
-            delta = now - start_time
-            fps = counter / delta.total_seconds()
-            print(f"FPS: {fps:0.2f}")
+        #if counter % 100 == 0:
+        #    delta = now - start_time
+        #    fps = counter / delta.total_seconds()
+        #    print(f"FPS: {fps:0.2f}")
 
 
 while True:
